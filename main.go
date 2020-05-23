@@ -12,6 +12,7 @@ import (
 
 	"github.com/Rain-31/go-i18n/v1/i18n"
 	_ "github.com/Rain-31/i18n-gen/catalog"
+	tools "github.com/Rain-31/i18n-gen/tools"
 	"github.com/Xuanwo/go-locale"
 	uuid "github.com/satori/go.uuid"
 	"github.com/urfave/cli/v2"
@@ -59,7 +60,7 @@ func main() {
 						return fmt.Errorf(i18n.Sprintf(sessionId, `destfile cannot be empty`))
 					}
 
-					err := i18n.Update(sessionId, srcFile, destFile)
+					err := tools.Update(sessionId, srcFile, destFile)
 
 					return err
 				},
@@ -78,7 +79,7 @@ func main() {
 					if len(outFile) == 0 {
 						outFile = "./locales/en.json"
 					}
-					err := i18n.Extract([]string{
+					err := tools.Extract([]string{
 						path,
 					}, outFile)
 					return err
@@ -106,7 +107,7 @@ func main() {
 						outFile = "./catalog.go"
 					}
 					pkgName := c.String("pkg")
-					err := i18n.Generate(
+					err := tools.Generate(
 						sessionId,
 						pkgName,
 						[]string{
