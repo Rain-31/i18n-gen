@@ -27,24 +27,24 @@ func main() {
 	i18n.RegistPrinter(sessionId, language.SimplifiedChinese)
 	defer i18n.DeletePrinter(sessionId)
 
-	i18n.Printf(sessionId, `hello world!`)
+	i18n.Session(sessionId).Printf(`hello world!`)
 	fmt.Println()
 
 	name := `Lukin`
 
-	i18n.Printf(sessionId, `hello %s!`, name)
+	i18n.Session(sessionId).Printf(`hello %s!`, name)
 	fmt.Println()
 
-	i18n.Printf(sessionId, `%s has %d cat.`, name, 1)
+	i18n.Session(sessionId).Printf(`%s has %d cat.`, name, 1)
 	fmt.Println()
 
-	i18n.Printf(sessionId, `%s has %d cat.`, name, 2, i18n.Plural(
+	i18n.Session(sessionId).Printf(`%s has %d cat.`, name, 2, i18n.Plural(
 		`%[2]d=1`, `%s has %d cat.`,
 		`%[2]d>1`, `%s has %d cats.`,
 	))
 	fmt.Println()
 
-	i18n.Fprintf(sessionId, os.Stderr, `%s have %d apple.`, name, 2, i18n.Plural(
+	i18n.Session(sessionId).Fprintf(os.Stderr, `%s have %d apple.`, name, 2, i18n.Plural(
 		`%[2]d=1`, `%s have an apple.`,
 		`%[2]d=2`, `%s have two apples.`,
 		`%[2]d>2`, `%s have %d apples.`,

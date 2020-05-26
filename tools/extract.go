@@ -54,10 +54,7 @@ func Extract(paths []string, outFile string) error {
 				switch v := n.(type) {
 				case *ast.CallExpr:
 					if fn, ok := v.Fun.(*ast.SelectorExpr); ok {
-						var packName string
-						if pack, ok := fn.X.(*ast.Ident); ok {
-							packName = pack.Name
-						}
+						packName := getPackName(n)
 						funcName := fn.Sel.Name
 						namePos := fset.Position(fn.Sel.NamePos)
 						// Package name must be equal
@@ -66,7 +63,7 @@ func Extract(paths []string, outFile string) error {
 							if funcName == "Printf" || funcName == "Sprintf" || funcName == "Fprintf" {
 								fmt.Printf("Extract %+v %v.%v ...\n", namePos, packName, funcName)
 								// Find the string to be translated
-								if str, ok := v.Args[1].(*ast.BasicLit); ok {
+								if str, ok := v.Args[0].(*ast.BasicLit); ok {
 									id := strings.Trim(str.Value, "\"`")
 									if _, ok := messages[id]; !ok {
 										messages[id] = id
@@ -130,7 +127,7 @@ func Extract(paths []string, outFile string) error {
 
 func i18nPackageName(file *ast.File) string {
 	for _, i := range file.Imports {
-		if i.Path.Kind == token.STRING && i.Path.Value == `"github.com/rain-31/go-i18n/v1/i18n"` {
+		if i.Path.Kind == token.STRING && strings.ToLower(i.Path.Value) == `"github.com/rain-31/go-i18n/v1/i18n"` {
 			if i.Name == nil {
 				return "i18n"
 			}
@@ -138,4 +135,19 @@ func i18nPackageName(file *ast.File) string {
 		}
 	}
 	return ""
+}
+
+func getPackName(node ast.Node) string {
+	for {
+		switch v := node.(type) {
+		case *ast.CallExpr:
+			node = v.Fun
+		case *ast.SelectorExpr:
+			node = v.X
+		case *ast.Ident:
+			return node.(*ast.Ident).Name
+		default:
+			return ""
+		}
+	}
 }
