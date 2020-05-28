@@ -24,10 +24,16 @@ func main() {
 		sessionId = uuid.String()
 	}
 
-	i18n.RegistPrinter(sessionId, language.SimplifiedChinese)
+	printer := i18n.RegistPrinter(sessionId, language.SimplifiedChinese)
 	defer i18n.DeletePrinter(sessionId)
 
 	i18n.Session(sessionId).Printf(`hello world!`)
+	fmt.Println()
+
+	i18n.Printf(sessionId, `no session example`)
+	fmt.Println()
+
+	printer.Printf("printer example")
 	fmt.Println()
 
 	name := `Lukin`

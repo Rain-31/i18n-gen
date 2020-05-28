@@ -63,7 +63,7 @@ func Extract(paths []string, outFile string) error {
 							if funcName == "Printf" || funcName == "Sprintf" || funcName == "Fprintf" {
 								fmt.Printf("Extract %+v %v.%v ...\n", namePos, packName, funcName)
 								// Find the string to be translated
-								if str, ok := v.Args[0].(*ast.BasicLit); ok {
+								if str, ok := v.Args[getStringIndex(n)].(*ast.BasicLit); ok {
 									id := strings.Trim(str.Value, "\"`")
 									if _, ok := messages[id]; !ok {
 										messages[id] = id
@@ -145,9 +145,44 @@ func getPackName(node ast.Node) string {
 		case *ast.SelectorExpr:
 			node = v.X
 		case *ast.Ident:
-			return node.(*ast.Ident).Name
+			if v.Obj != nil && isPrinter(v.Obj.Type) {
+				return "i18n"
+			}
+			return v.Name
 		default:
 			return ""
 		}
+	}
+}
+
+func getStringIndex(node ast.Node) int {
+	for {
+		switch v := node.(type) {
+		case *ast.CallExpr:
+			node = v.Fun
+		case *ast.SelectorExpr:
+			if v.Sel.Name == "Session" {
+				return 0
+			}
+			node = v.X
+		case *ast.Ident:
+			if v.Obj != nil && isPrinter(v.Obj.Type) {
+				return 0
+			}
+			return 1
+		default:
+			return 1
+		}
+	}
+}
+
+func isPrinter(obj interface{}) bool {
+	switch obj.(type) {
+	case *i18n.PrinterSession:
+		return true
+	case i18n.PrinterSession:
+		return true
+	default:
+		return true
 	}
 }

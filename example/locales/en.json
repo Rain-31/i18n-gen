@@ -5,5 +5,7 @@
   "%s have an apple.": "%s have an apple.",
   "%s have two apples.": "%s have two apples.",
   "hello %s!": "hello %s!",
-  "hello world!": "hello world!"
+  "hello world!": "hello world!",
+  "no session example": "no session example",
+  "printer example": "printer example"
 }
